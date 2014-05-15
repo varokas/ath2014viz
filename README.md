@@ -4,6 +4,8 @@ ATH2014 Visualization
 This repo creates a visualization for ath2014 attendees based
 on data in /data/attendees.csv.
 
+See the visualization at: [http://varokas.github.io/ath2014viz/](http://varokas.github.io/ath2014viz/)
+
 
 For Any Contributors
 -----
