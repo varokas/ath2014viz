@@ -1,0 +1,2 @@
+iconv -t utf8 ~/Downloads/attendees\ -\ attendees.csv > data/attendees.txt
+rm ~/Downloads/attendees\ -\ attendees.csv

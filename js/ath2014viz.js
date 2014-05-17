@@ -1,9 +1,19 @@
+_.flatMap = _.compose(_.flatten, _.map)
+
 d3.csv("data/attendees.txt", function(error, data) {
   var extractedData = extractData(data);
 
+  var pastAgileConf = _.flatten(
+    extractedData
+      .map(function(e) { return e["pastAgileConf"]; })
+      .filter(function(e) { return e != "-"; })
+  );
+  var pastAgileConfCount = _.countBy(pastAgileConf, function(data) { return data; });
+
   createCharts({
     "levelData" : countAndMapToLabel(extractedData,"level"),
-    "beenToAgileConfData": countAndMapToLabel(extractedData,"beenToAgileConf")
+    "beenToAgileConfData": countAndMapToLabel(extractedData,"beenToAgileConf"),
+    "pastAgileConf": mapToLabelAndValue(pastAgileConfCount)
   });
 });
 
@@ -16,6 +26,12 @@ function countAndMapToLabel(extractedData, field) {
   return mapToLabelAndValue(countBy);
 }
 
+function mapToLabelAndValue(obj) {
+  return _.map(obj, function(value, key){
+    return { "label":key, "value":value };
+  });
+}
+
 /// Extracting Data ///
 
 function extractData(originalData) {
@@ -25,7 +41,8 @@ function extractData(originalData) {
 function scrubLine(line) {
   return {
     "level" : line["บอกเราหน่อยสิ คุณน่ะ อไจล์แค่ไหน ?"],
-    "beenToAgileConf": extractBeenToAgileConf(line["ถามหน่อยน๊า  เคยไปงานสัมมนา เกี่ยวกับ agile มาก่อน อ๊ะป่าว ? "])
+    "beenToAgileConf": extractBeenToAgileConf(line["BeenToAgileConf"]),
+    "pastAgileConf": extractArray(line["PastAgileConf"])
   };
 }
 
@@ -33,10 +50,8 @@ function extractBeenToAgileConf(data) {
   if(data == "เคยไปมาแล้ว") return "เคย"; else return "ไม่เคย";
 }
 
-function mapToLabelAndValue(obj) {
-  return _.map(obj, function(value, key){
-    return { "label":key, "value":value };
-  });
+function extractArray(data) {
+  return data.split(",").map( function(token) { return token.trim(); } );
 }
 
 /// Creating Charts ///
@@ -44,6 +59,7 @@ function mapToLabelAndValue(obj) {
 function createCharts(options) {
   createPieChart(options.levelData, "agileLevelsChart");
   createPieChart(options.beenToAgileConfData, "beenToAgileConfChart");
+  createPieChart(options.pastAgileConf, "pastAgileConfChart");
 }
 
 function createPieChart(data, divId) {
