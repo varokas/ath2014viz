@@ -10,10 +10,18 @@ d3.csv("data/attendees.txt", function(error, data) {
   );
   var pastAgileConfCount = _.countBy(pastAgileConf, function(data) { return data; });
 
+  var roles = _.flatten(
+    extractedData
+      .map(function(e) { return e["roles"]; })
+  );
+  var rolesCount = _.countBy(roles, function(data) { return data; });
+  console.log(roles);
+
   createCharts({
     "levelData" : countAndMapToLabel(extractedData,"level"),
     "beenToAgileConfData": countAndMapToLabel(extractedData,"beenToAgileConf"),
-    "pastAgileConf": mapToLabelAndValue(pastAgileConfCount)
+    "pastAgileConf": mapToLabelAndValue(pastAgileConfCount),
+    "roles": mapToLabelAndValue(rolesCount)
   });
 });
 
@@ -42,7 +50,8 @@ function scrubLine(line) {
   return {
     "level" : line["บอกเราหน่อยสิ คุณน่ะ อไจล์แค่ไหน ?"],
     "beenToAgileConf": extractBeenToAgileConf(line["BeenToAgileConf"]),
-    "pastAgileConf": extractArray(line["PastAgileConf"])
+    "pastAgileConf": extractArray(line["PastAgileConf"]),
+    "roles": extractArray(line["Roles"])
   };
 }
 
@@ -60,6 +69,7 @@ function createCharts(options) {
   createPieChart(options.levelData, "agileLevelsChart");
   createPieChart(options.beenToAgileConfData, "beenToAgileConfChart");
   createPieChart(options.pastAgileConf, "pastAgileConfChart");
+  createPieChart(options.roles, "rolesChart");
 }
 
 function createPieChart(data, divId) {
