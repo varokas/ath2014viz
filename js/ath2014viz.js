@@ -3,19 +3,20 @@ _.flatMap = _.compose(_.flatten, _.map)
 d3.csv("data/attendees.txt", function(error, data) {
   var extractedData = extractData(data);
 
-  var pastAgileConf = _.flatten(
+  var pastAgileConfCount = countData(_.flatten(
     extractedData
       .map(function(e) { return e["pastAgileConf"]; })
       .filter(function(e) { return e != "-"; })
-  );
-  var pastAgileConfCount = _.countBy(pastAgileConf, function(data) { return data; });
-
-  var roles = _.flatten(
+  ));
+  var rolesCount = countData(_.flatten(
     extractedData
       .map(function(e) { return e["roles"]; })
-  );
-  var rolesCount = _.countBy(roles, function(data) { return data; });
-  console.log(roles);
+  ));
+  // console.log(_.flatten(
+  //   extractedData
+  //     .map(function(e) { return e["shares"]; })
+  //     .filter(function(e) { return e != ""; })
+  // ));
 
   createCharts({
     "levelData" : countAndMapToLabel(extractedData,"level"),
@@ -40,6 +41,10 @@ function mapToLabelAndValue(obj) {
   });
 }
 
+function countData(data) {
+  return _.countBy(data, function(d) { return d; });
+}
+
 /// Extracting Data ///
 
 function extractData(originalData) {
@@ -51,7 +56,8 @@ function scrubLine(line) {
     "level" : line["บอกเราหน่อยสิ คุณน่ะ อไจล์แค่ไหน ?"],
     "beenToAgileConf": extractBeenToAgileConf(line["BeenToAgileConf"]),
     "pastAgileConf": extractArray(line["PastAgileConf"]),
-    "roles": extractArray(line["Roles"])
+    "shares": extractArray(line["WantToShareTag"]),
+    "listens": extractArray(line["WantToListenTag"])
   };
 }
 
