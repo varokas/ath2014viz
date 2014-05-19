@@ -56,6 +56,7 @@ function scrubLine(line) {
     "level" : line["บอกเราหน่อยสิ คุณน่ะ อไจล์แค่ไหน ?"],
     "beenToAgileConf": extractBeenToAgileConf(line["BeenToAgileConf"]),
     "pastAgileConf": extractArray(line["PastAgileConf"]),
+    "roles": extractArray(line["Roles"]),
     "shares": extractArray(line["WantToShareTag"]),
     "listens": extractArray(line["WantToListenTag"])
   };
