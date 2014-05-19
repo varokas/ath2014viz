@@ -118,7 +118,7 @@ function createTagCloud(data, id) {
 
   d3.layout.cloud().size([width, height])
       .words(
-        _.map(data, function(value, key) { return {text: key, size: 15 + 3 * value }; })
+        _.map(data, function(value, key) { return {text: key, size: (15 + 3 * value) }; })
       )
       .padding(5)
       .rotate(function() { return 0; })
