@@ -12,17 +12,24 @@ d3.csv("data/attendees.txt", function(error, data) {
     extractedData
       .map(function(e) { return e["roles"]; })
   ));
-  // console.log(_.flatten(
-  //   extractedData
-  //     .map(function(e) { return e["shares"]; })
-  //     .filter(function(e) { return e != ""; })
-  // ));
+  var sharesCount = countData(_.flatten(
+    extractedData
+      .map(function(e) { return e["shares"]; })
+      .filter(function(e) { return e != ""; })
+  ));
+  var listensCount = countData(_.flatten(
+    extractedData
+      .map(function(e) { return e["listens"]; })
+      .filter(function(e) { return e != ""; })
+  ));
 
   createCharts({
     "levelData" : countAndMapToLabel(extractedData,"level"),
     "beenToAgileConfData": countAndMapToLabel(extractedData,"beenToAgileConf"),
     "pastAgileConf": mapToLabelAndValue(pastAgileConfCount),
-    "roles": mapToLabelAndValue(rolesCount)
+    "roles": mapToLabelAndValue(rolesCount),
+    "shares": sharesCount,
+    "listens": listensCount
   });
 });
 
@@ -77,6 +84,8 @@ function createCharts(options) {
   createPieChart(options.beenToAgileConfData, "beenToAgileConfChart");
   createPieChart(options.pastAgileConf, "pastAgileConfChart");
   createPieChart(options.roles, "rolesChart");
+  createTagCloud(options.shares, "sharesChart");
+  createTagCloud(options.listens, "listensChart");
 }
 
 function createPieChart(data, divId) {
@@ -96,4 +105,46 @@ function createPieChart(data, divId) {
 
     return chart;
   });
+}
+
+var fill = d3.scale.category20();
+
+function createTagCloud(data, id) {
+  var container = d3.select("#"+id);
+  var width = parseInt(container.style('width'));
+  var height = width;
+
+  var drawTagCloudFunc = drawTagCloud(id, width, height);
+
+  d3.layout.cloud().size([width, height])
+      .words(
+        _.map(data, function(value, key) { return {text: key, size: 15 + 3 * value }; })
+      )
+      .padding(5)
+      .rotate(function() { return 0; })
+      .font("Impact")
+      .fontSize(function(d) { return d.size; })
+      .on("end", drawTagCloudFunc)
+      .start();
+}
+
+function drawTagCloud(id, width, height) {
+  return function(words) {
+    d3.select("#" + id).append("svg")
+        .style("width", width)
+        .style("height", height)
+      .append("g")
+        .attr("transform", "translate(" + width/2 + "," + height/2 + ")")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) { return fill(i); })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+  }
 }
